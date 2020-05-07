@@ -1,11 +1,11 @@
 /* global d3 */
 /*
- ng-radial-gauge 1.0.3
+ ng-radial-gauge 1.0.3.1
  (c) 2010-2017 Stéphane Therrien,
  https://github.com/stherrienaspnet/ngRadialGauge
  License: MIT
 
- Version 1.0.3
+ Version 1.0.3.1
  Author: Stephane Therrien
  Fixed needle hidden when value are passing from out of range to in range.
 */
@@ -184,7 +184,7 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
                  return graduationsAngles;
              };
              var getNewAngle = function(pValue) {
-                 var scale = d3.scaleLinear().range([0, 1]).domain([minLimit, maxLimit]);
+                 var scale = d3.scale.linear().range([0, 1]).domain([minLimit, maxLimit]);
                  var ratio = scale(pValue);
                  var scaleRange = 2 * gaugeAngle;
                  var minScale = -1 * gaugeAngle;
@@ -275,7 +275,7 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
                             [-needleRadius, 0],
                             [needleRadius, 0]
                          ];
-                         var pointerLine = d3.line().curve(d3.curveMonotoneX);
+                         var pointerLine = d3.svg.line().interpolate('monotone');
                          var pg = svg.append('g').data([lineData])
                                      .attr('class', 'mtt-graduation-needle')
                                      .style("fill", needleColor)
@@ -349,8 +349,8 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
 
                      //Render Gauge Color Area
                      var translate = "translate(" + view.width / 2 + "," + view.width / 2 + ")";
-                     var cScale = d3.scaleLinear().domain([minLimit, maxLimit]).range([-1 * gaugeAngle * (Math.PI / 180), gaugeAngle * (Math.PI / 180)]);
-                     var arc = d3.arc()
+                     var cScale = d3.scale.linear().domain([minLimit, maxLimit]).range([-1 * gaugeAngle * (Math.PI / 180), gaugeAngle * (Math.PI / 180)]);
+                     var arc = d3.svg.arc()
                          .innerRadius(innerRadius)
                          .outerRadius(outerRadius)
                          .startAngle(function (d) { return cScale(d[0]); })
@@ -382,6 +382,7 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
                         var needleAngle = getNewAngle(pValue);
                         needle.transition()
                             .duration(transitionMs)
+                            .ease('elastic')
                             .attr('transform', 'rotate('+needleAngle+')');
 
                         svg.selectAll('.mtt-graduation-needle').style("visibility", "visible");
