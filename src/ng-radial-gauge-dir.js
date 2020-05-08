@@ -25,7 +25,8 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
              majorGraduationPrecision: '=',
              hideGraduationDetails: '<',
              label: '@',
-             onClick: '&'
+             onClick: '&',
+             formatValue: '&',
          },
          link: function (scope, ele, attrs) {
              var defaultUpperLimit = 100;
@@ -70,6 +71,7 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
              if(attrs.hideGraduationDetails === "true" || attrs.hideGraduationDetails === "false") {
                  hideGraduationDetails = attrs.hideGraduationDetails === "true";
              }
+             var formatValue = attrs.formatValue;
 
              //The scope.data object might contain the data we need, otherwise we fall back on the scope.xyz property
              var extractData = function (prop) {
@@ -289,6 +291,13 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
                                     .attr('d', pointerLine)
                                     .attr('transform', 'rotate('+needleAngle+')');
 
+                     var text;
+                     if(scope.formatValue !== undefined && scope.formatValue !== null) {
+                         text = scope.formatValue({value: value, precision: precision, valueUnit: valueUnit});
+                     } else {
+                         text = '[ ' + value.toFixed(precision) + valueUnit + ' ]';
+                     }
+
                      svg.append("text")
                          .attr("x", centerX)
                          .attr("y", centerY + valueVerticalOffset)
@@ -297,7 +306,7 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
                          .attr("text-anchor", "middle")
                          .attr("font-weight", "bold")
                          .style("font", fontStyle)
-                         .text('[ ' + value.toFixed(precision) + valueUnit + ' ]');
+                         .text(text);
                  }
 
                  var circleRadius = (view.width * 6) / 300;
