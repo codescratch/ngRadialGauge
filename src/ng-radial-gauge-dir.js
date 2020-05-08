@@ -23,6 +23,7 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
              valueUnit: '=',
              precision: '=',
              majorGraduationPrecision: '=',
+             hideGraduationDetails: '<',
              label: '@',
              onClick: '&'
          },
@@ -65,6 +66,10 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
              var majorGraduationTextSize = parseInt(attrs.majorGraduationTextSize);
              var needleValueTextSize = parseInt(attrs.needleValueTextSize);
              var needle = undefined;
+             var hideGraduationDetails = false;
+             if(attrs.hideGraduationDetails === "true" || attrs.hideGraduationDetails === "false") {
+                 hideGraduationDetails = attrs.hideGraduationDetails === "true";
+             }
 
              //The scope.data object might contain the data we need, otherwise we fall back on the scope.xyz property
              var extractData = function (prop) {
@@ -363,10 +368,13 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
                          .style("fill", function (d) { return d[2]; })
                          .attr("transform", translate);
 
-                     var majorGraduationsAngles = getMajorGraduationAngles();
-                     var majorGraduationValues = getMajorGraduationValues(minLimit, maxLimit, majorGraduationPrecision);
-                     renderMajorGraduations(majorGraduationsAngles);
-                     renderMajorGraduationTexts(majorGraduationsAngles, majorGraduationValues, valueUnit);
+                     if(!hideGraduationDetails) {
+                        var majorGraduationsAngles = getMajorGraduationAngles();
+                        var majorGraduationValues = getMajorGraduationValues(minLimit, maxLimit, majorGraduationPrecision);
+                        renderMajorGraduations(majorGraduationsAngles);
+                        renderMajorGraduationTexts(majorGraduationsAngles, majorGraduationValues, valueUnit);
+                     }
+
                      renderGraduationNeedle(value, valueUnit, precision, minLimit, maxLimit);
                      initialized = true;
                  }, 200);
